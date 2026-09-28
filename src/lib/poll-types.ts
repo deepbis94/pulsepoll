@@ -62,6 +62,41 @@ export function isPollMeta(value: unknown): value is PollMeta {
   );
 }
 
+export function isPollResults(value: unknown): value is PollResults {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  if (!record.poll || typeof record.poll !== "object") return false;
+  if (!record.voter || typeof record.voter !== "object") return false;
+  if (typeof record.totalVotes !== "number" || typeof record.updatedAt !== "string") return false;
+
+  const poll = record.poll as Record<string, unknown>;
+  const voter = record.voter as Record<string, unknown>;
+  return (
+    typeof poll.shortCode === "string" &&
+    typeof poll.question === "string" &&
+    (poll.choiceType === "SINGLE" || poll.choiceType === "MULTIPLE") &&
+    (poll.expiresAt === null || typeof poll.expiresAt === "string") &&
+    typeof poll.createdAt === "string" &&
+    typeof poll.closed === "boolean" &&
+    Array.isArray(poll.options) &&
+    poll.options.every(isResultOption) &&
+    typeof voter.hasVoted === "boolean" &&
+    Array.isArray(voter.optionIds) &&
+    voter.optionIds.every((id) => typeof id === "string")
+  );
+}
+
+function isResultOption(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.id === "string" &&
+    typeof record.label === "string" &&
+    typeof record.position === "number" &&
+    typeof record.votes === "number"
+  );
+}
+
 function isPollOptionMeta(value: unknown): value is PollOptionMeta {
   if (!value || typeof value !== "object") return false;
   const record = value as Record<string, unknown>;

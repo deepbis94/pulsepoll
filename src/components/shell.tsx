@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 export function Shell({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-lg flex-col px-5 pb-16 pt-8">
+    <div className="mx-auto flex min-h-full w-full max-w-lg flex-col px-5 pb-[max(4rem,env(safe-area-inset-bottom))] pt-8">
       <header>
         <Link href="/" className="inline-flex items-center gap-2.5">
           <span className="relative flex h-2.5 w-2.5" aria-hidden>

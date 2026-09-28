@@ -2,13 +2,13 @@
 
 Live polls. A host creates a poll, shares a short link, and every connected browser watches the counts move.
 
-This repository is the scaffold: Next.js App Router, Tailwind, Prisma, and the vote/read path (Postgres plus a fenced Redis cache). The create form, voting UI, and animated chart are next.
+Create a poll on the home page. Open `/p/[code]` to vote. Results poll every 1.5 seconds, pause while the tab is hidden, and animate between payloads.
 
 ## Engineering decisions
 
 ### Live updates
 
-Votes are written on `POST /api/polls/[code]/votes`. The handler stores the rows in Postgres, then updates a Redis hash of per-option counts. Open browsers learn about new votes by polling `GET /api/polls/[code]` about every 1.5 seconds. The response is `Cache-Control: no-store`. The chart will animate between payloads, and the payload includes `updatedAt` for a "last updated" label.
+Votes are written on `POST /api/polls/[code]/votes`. The handler stores the rows in Postgres, then updates a Redis hash of per-option counts. Open browsers learn about new votes by polling `GET /api/polls/[code]` about every 1.5 seconds. The response is `Cache-Control: no-store`. The chart animates between payloads, and `updatedAt` drives the "last updated" label. The browser skips the poll while `document.visibilityState` is `hidden`.
 
 **Server-Sent Events fed by Redis pub/sub** is the other realistic design. After each vote the API would `PUBLISH`, and each browser would hold an EventSource open. That fits a long-running process. On this stack it fights the platform:
 
@@ -107,6 +107,34 @@ One POST is one ballot: a single option, or several on a multiple-choice poll. A
 
 Clearing cookies or switching browsers creates a new voter. That is the accepted gap for an anonymous poll. Accounts or device fingerprints cost privacy and still lose to a determined user.
 
+## Live demo
+
+Production URL: _add the Vercel URL here after deploy._
+
+Until that hostname is filled in, run the app locally with the steps below.
+
+## Screenshots
+
+Capture these on a phone-width viewport after deploy and commit them under `docs/screenshots/`.
+
+1. **Create** — `docs/screenshots/create.png` — home page form, including option rows and the duration control.
+2. **Vote** — `docs/screenshots/vote.png` — open poll with vote buttons.
+3. **Results** — `docs/screenshots/results.png` — animated bars, the voter count, and the last-updated line.
+
+## Deploy
+
+The production target is Vercel, with Upstash Redis and hosted Postgres (Neon or Supabase).
+
+Set these environment variables on the Vercel project:
+
+- `DATABASE_URL`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+`npm run build` is the build command. `postinstall` generates the Prisma client. Apply migrations to the production database with `npx prisma migrate deploy` before the first real poll.
+
+After the deployment is up, replace the live demo URL and add the three screenshots above.
+
 ## Local development
 
 ```bash
@@ -124,5 +152,8 @@ npm run dev
 | Script | Purpose |
 | --- | --- |
 | `npm run dev` | Next.js dev server |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Vitest |
 | `npm run db:migrate` | Create and apply a Prisma migration |
 | `npm run db:generate` | Regenerate the Prisma client |

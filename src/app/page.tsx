@@ -1,3 +1,4 @@
+import { CreatePollForm } from "@/components/create-poll-form";
 import { Shell } from "@/components/shell";
 
 export default function HomePage() {
@@ -9,13 +10,7 @@ export default function HomePage() {
       <p className="mt-4 text-lg leading-relaxed text-muted">
         Create a poll, share a short link, and watch the bars move as the room votes.
       </p>
-      <section className="mt-10 rounded-3xl border border-line bg-card p-5 shadow-[0_1px_0_rgba(28,23,20,0.04)]">
-        <h2 className="font-serif text-2xl tracking-tight">New poll</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          A question, two to ten options, and an optional closing time. The form lands
-          on this card next.
-        </p>
-      </section>
+      <CreatePollForm />
     </Shell>
   );
 }
