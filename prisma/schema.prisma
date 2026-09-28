@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ChoiceType {
+  SINGLE
+  MULTIPLE
+}
+
+/// Public polls are addressed by shortCode. ballotSeq is the fencing token
+/// for the Redis count cache: it increments in the same transaction as the
+/// vote insert, so a snapshot and an incremental update can be ordered.
+model Poll {
+  id         String     @id @default(cuid())
+  shortCode  String     @unique @db.VarChar(12)
+  question   String     @db.VarChar(280)
+  choiceType ChoiceType @default(SINGLE)
+  expiresAt  DateTime?
+  ballotSeq  Int        @default(0)
+  createdAt  DateTime   @default(now())
+
+  options Option[]
+  votes   Vote[]
+}
+
+model Option {
+  id       String @id @default(cuid())
+  pollId   String
+  label    String @db.VarChar(120)
+  position Int    @db.SmallInt
+
+  poll  Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes Vote[]
+
+  // Leftmost column serves "options for this poll". A separate pollId index
+  // would only add write cost.
+  @@unique([pollId, position])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  pollId    String
+  optionId  String
+  voterKey  String   @db.VarChar(64)
+  ballotSeq Int
+  createdAt DateTime @default(now())
+
+  poll   Poll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option Option @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  // One row per selected option. pollId is denormalized so poll-scoped counts
+  // and the double-vote check do not join through Option.
+  @@unique([pollId, voterKey, optionId])
+  @@unique([pollId, ballotSeq, optionId])
+  @@index([optionId])
+}
