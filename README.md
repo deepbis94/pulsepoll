@@ -153,7 +153,7 @@ npm run dev
 | --- | --- |
 | `npm run dev` | Next.js dev server |
 | `npm run lint` | ESLint |
-| `npm run typecheck` | `tsc --noEmit` |
+| `npm run typecheck` | `next typegen` then `tsc --noEmit` |
 | `npm test` | Vitest |
 | `npm run db:migrate` | Create and apply a Prisma migration |
 | `npm run db:generate` | Regenerate the Prisma client |
