@@ -109,17 +109,13 @@ Clearing cookies or switching browsers creates a new voter. That is the accepted
 
 ## Live demo
 
-Production URL: _add the Vercel URL here after deploy._
-
-Until that hostname is filled in, run the app locally with the steps below.
+https://pulsepoll-iota.vercel.app/
 
 ## Screenshots
 
-Capture these on a phone-width viewport after deploy and commit them under `docs/screenshots/`.
+Phone-width capture of the live app.
 
 1. **Create** — `docs/screenshots/create.png` — home page form, including option rows and the duration control.
-2. **Vote** — `docs/screenshots/vote.png` — open poll with vote buttons.
-3. **Results** — `docs/screenshots/results.png` — animated bars, the voter count, and the last-updated line.
 
 ## Deploy
 
@@ -133,7 +129,7 @@ Set these environment variables on the Vercel project:
 
 `npm run build` is the build command. `postinstall` generates the Prisma client. Apply migrations to the production database with `npx prisma migrate deploy` before the first real poll.
 
-After the deployment is up, replace the live demo URL and add the three screenshots above.
+The live app is https://pulsepoll-iota.vercel.app/.
 
 ## Local development
 
